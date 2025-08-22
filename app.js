@@ -57,7 +57,7 @@ class STEMCompanion {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + 'ADD-YOUR-XAI-API-KEY-HERE'
+                'Authorization': 'Bearer ' + (localStorage.getItem('xai_api_key') || 'ADD-YOUR-XAI-API-KEY-HERE')
             },
             body: JSON.stringify({
                 model: 'grok-2-latest',  // Changed model name
