@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Marie - Your STEM Companion</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dr. Marie</h1>
+            <p class="tagline">Your STEM Research Companion</p>
+        </header>
+        
+        <div class="avatar-section">
+            <!-- We'll use a professional avatar here -->
+            <div class="avatar">
+                <div class="scientist-avatar">👩‍🔬</div>
+            </div>
+            <p class="greeting">Hello! I'm Dr. Marie. How can I help with your research today?</p>
+        </div>
+        
+        <div class="chat-container">
+            <div id="chat-history"></div>
+            <div class="input-section">
+                <textarea 
+                    id="user-input" 
+                    placeholder="Ask about biology, chemistry, physics, research methods..."
+                    rows="3"></textarea>
+                <button id="send-btn">Send</button>
+            </div>
+        </div>
+        
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="tutor">Study Mode</button>
+            <button class="mode-btn" data-mode="research">Research Mode</button>
+            <button class="mode-btn" data-mode="inspiration">Inspiration</button>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
