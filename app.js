@@ -48,67 +48,109 @@ class STEMCompanion {
     }
 
     async getCompanionResponse(message) {
-    const systemPrompt = `You are Dr. Marie, a professional female scientist and STEM educator. 
-    You are warm, encouraging, and passionate about science education.
-    IMPORTANT: You maintain strict professional boundaries - never flirt, never make personal comments.
-    You focus exclusively on science, research, and inspiring learning.
-    
-    Current mode: ${this.mode}
-    - Tutor mode: Explain concepts clearly, use analogies, be patient
-    - Research mode: Discuss methodology, papers, experimental design  
-    - Inspiration mode: Share stories of diverse scientists, especially women in STEM`;
-
-    try {
-        // Try the API call
-        const response = await fetch('https://api.x.ai/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + (localStorage.getItem('xai_api_key') || 'ADD-YOUR-XAI-API-KEY-HERE')
-            },
-            body: JSON.stringify({
-                model: 'grok-2-latest',  // Changed model name
-                messages: [
-                    {
-                        role: 'system',
-                        content: systemPrompt
-                    },
-                    {
-                        role: 'user', 
-                        content: message
-                    }
-                ],
-                temperature: 0.7,
-                max_tokens: 500
-            })
-        });
-
-        console.log('Response status:', response.status);
+        const systemPrompt = `You are Dr. Marie, a professional female scientist and STEM educator. 
+        You are warm, encouraging, and passionate about science education.
+        IMPORTANT: You maintain strict professional boundaries - never flirt, never make personal comments.
+        You focus exclusively on science, research, and inspiring learning.
         
-        if (!response.ok) {
-            console.log('API Error. Status:', response.status);
-            const errorText = await response.text();
-            console.log('Error details:', errorText);
-            throw new Error(`API returned ${response.status}`);
+        Current mode: ${this.mode}
+        - Tutor mode: Explain concepts clearly, use analogies, be patient
+        - Research mode: Discuss methodology, papers, experimental design  
+        - Inspiration mode: Share stories of diverse scientists, especially women in STEM`;
+
+        try {
+            const response = await fetch('https://api.x.ai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + (localStorage.getItem('xai_api_key') || 'xai-0Kz90CfSb70AMTQ2m7hQ6adozLVVjXJmQgwEjEfglBEYkMAkJVtL6AoSSF2wRiSi0JBD7uU6hg4xuia2')
+                },
+                body: JSON.stringify({
+                    model: 'grok-2-latest',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: systemPrompt
+                        },
+                        {
+                            role: 'user', 
+                            content: message
+                        }
+                    ],
+                    temperature: 0.7,
+                    max_tokens: 500
+                })
+            });
+
+            console.log('Response status:', response.status);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('API Error Details:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    error: errorText,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Return more helpful error messages
+                if (response.status === 429) {
+                    return "Dr. Marie needs a moment to catch up - too many questions at once! Please try again in a few seconds.";
+                } else if (response.status === 401) {
+                    return "There's an issue with my credentials. Please check the API key configuration.";
+                } else {
+                    throw new Error(`API returned ${response.status}`);
+                }
+            }
+
+            const data = await response.json();
+            console.log('Successful API Response');
+            
+            if (data && data.choices && data.choices[0] && data.choices[0].message) {
+                return data.choices[0].message.content;
+            } else {
+                console.error('Unexpected response structure:', data);
+                throw new Error('Unexpected API response structure');
+            }
+            
+        } catch (error) {
+            console.error('Error calling Grok:', {
+                error: error.message,
+                timestamp: new Date().toISOString(),
+                userMessage: message,
+                mode: this.mode
+            });
+            
+            // Better fallback responses
+            return this.getSmartFallback(message);
+        }
+    }
+
+    getSmartFallback(message) {
+        const lowerMessage = message.toLowerCase();
+        
+        // Add specific responses for common topics when API fails
+        if (lowerMessage.includes('cancer')) {
+            return "I apologize - I'm having trouble connecting to my full knowledge base right now. But I can tell you that cancer biology involves uncontrolled cell growth due to DNA mutations. These mutations affect genes controlling cell division, repair, and death. For a more detailed explanation, please try again in a moment!";
+        }
+        
+        if (lowerMessage.includes('stem cell')) {
+            return "I'm having connection issues, but briefly: stem cells are undifferentiated cells that can develop into specialized cell types. They're crucial for development, repair, and potential therapies. Please try again for a more comprehensive explanation!";
         }
 
-        const data = await response.json();
-        console.log('API Response:', data);
-        
-        // Check if the response has the expected structure
-        if (data && data.choices && data.choices[0] && data.choices[0].message) {
-            return data.choices[0].message.content;
-        } else {
-            console.log('Unexpected response structure:', data);
-            throw new Error('Unexpected API response structure');
+        if (lowerMessage.includes('krebs') || lowerMessage.includes('citric acid')) {
+            return "Connection issue, but here's a quick overview: The Krebs cycle (citric acid cycle) is a series of chemical reactions in cells that generates energy through the oxidation of acetyl-CoA. It's central to cellular respiration. Please try again for a detailed explanation!";
+        }
+
+        if (lowerMessage.includes('photosynth')) {
+            return "Having connection troubles, but briefly: Photosynthesis converts light energy into chemical energy in plants and some bacteria, using CO2 and water to produce glucose and oxygen. Try again for a complete explanation!";
         }
         
-    } catch (error) {
-        console.error('Error calling Grok:', error);
+        // Default to the existing local response
         return this.getLocalResponse(message);
     }
-}
-getLocalResponse(message) {
+
+    getLocalResponse(message) {
         const responses = {
             tutor: this.getTutorResponse(message),
             research: this.getResearchResponse(message),
@@ -175,7 +217,7 @@ getLocalResponse(message) {
         chatHistory.appendChild(messageDiv);
         chatHistory.scrollTop = chatHistory.scrollHeight;
     }
-}  // THIS CLOSES THE CLASS
+}
 
 // Start the companion when page loads
 document.addEventListener('DOMContentLoaded', () => {
