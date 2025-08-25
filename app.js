@@ -153,7 +153,8 @@ getLocalResponse(message) {
         const chatHistory = document.getElementById('chat-history');
         const messageDiv = document.createElement('div');
         messageDiv.className = 'message bot-message';
-        messageDiv.textContent = message;
+        // Convert markdown to HTML
+        messageDiv.innerHTML = marked.parse(message);
         chatHistory.appendChild(messageDiv);
         chatHistory.scrollTop = chatHistory.scrollHeight;
     }
