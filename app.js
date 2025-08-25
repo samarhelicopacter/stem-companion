@@ -30,13 +30,20 @@ class STEMCompanion {
         const message = input.value.trim();
         
         if (!message) return;
-
+    
         // Add user message to chat
         this.addUserMessage(message);
         input.value = '';
-
+    
+        // Add loading message with a unique ID
+        const loadingId = 'loading-' + Date.now();
+        this.addLoadingMessage(loadingId);
+    
         // Get response
         const response = await this.getCompanionResponse(message);
+        
+        // Remove loading and add real response
+        document.getElementById(loadingId).remove();
         this.addBotMessage(response);
     }
 
@@ -155,6 +162,16 @@ getLocalResponse(message) {
         messageDiv.className = 'message bot-message';
         // Convert markdown to HTML
         messageDiv.innerHTML = marked.parse(message);
+        chatHistory.appendChild(messageDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+
+    addLoadingMessage(id) {
+        const chatHistory = document.getElementById('chat-history');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message bot-message';
+        messageDiv.id = id;
+        messageDiv.innerHTML = '<em>Dr. Marie is thinking of the best way to explain this...</em>';
         chatHistory.appendChild(messageDiv);
         chatHistory.scrollTop = chatHistory.scrollHeight;
     }
