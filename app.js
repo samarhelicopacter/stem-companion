@@ -63,9 +63,8 @@ class STEMCompanion {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + (localStorage.getItem('xai-JBTzlquBcJvd1xddqPKozNBctAmohRp4SaOz9CYAnO9H0qlfiYIRnwQpwPCPbCyIYTOq0WOVWTTme9Q0')
-                },
-        
+                    'Authorization': 'Bearer ' + (localStorage.getItem('xai_api_key') || 'xai-JBTzlquBcJvd1xddqPKozNBctAmohRp4SaOz9CYAnO9H0qlfiYIRnwQpwPCPbCyIYTOq0WOVWTTme9Q0')
+                 },
                 body: JSON.stringify({
                     model: 'grok-2-latest',
                     messages: [
